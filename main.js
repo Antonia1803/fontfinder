@@ -1,14 +1,12 @@
-
-const API_KEY = 'AIzaSyAsYiOrdnXJe_-D6GhXzbJNbXO6jDcqft8';
+const API_KEY = 'DEIN_GOOGLE_FONTS_API_KEY';
 let selectedTraits = new Set();
 
-// Initialisierung
 document.addEventListener('DOMContentLoaded', () => {
   initFilters();
+  document.getElementById('apply-btn').addEventListener('click', applyFilters);
   document.getElementById('reset-btn').addEventListener('click', resetFilters);
 });
 
-// Filter erstellen
 function initFilters() {
   const traits = [
     'Innovation', 'Authentizität', 'Vertrauen', 'Qualität', 'Nachhaltigkeit',
@@ -25,41 +23,44 @@ function initFilters() {
     wrapper.className = 'filter-item';
     wrapper.innerHTML = `
       <input type="checkbox" value="${trait}">
-      ${trait}
+      <span>${trait}</span>
     `;
     
     wrapper.querySelector('input').addEventListener('change', e => {
       if(e.target.checked && selectedTraits.size >= 4) {
         e.target.checked = false;
-        return alert('Maximal 4 Eigenschaften auswählbar');
+        return;
       }
       e.target.checked ? selectedTraits.add(trait) : selectedTraits.delete(trait);
-      updateFonts();
     });
     
     container.appendChild(wrapper);
   });
 }
 
-// Fonts aktualisieren
-async function updateFonts() {
-  const headline = document.getElementById('headline-input').value;
-  if(!headline) return;
+async function applyFilters() {
+  const headline = document.getElementById('headline-input').value.trim();
+  if(!headline) return alert('Bitte Headline eingeben');
+  if(selectedTraits.size === 0) return alert('Mindestens 1 Eigenschaft auswählen');
 
-  const response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=${API_KEY}`);
-  const data = await response.json();
-  
-  const filteredFonts = data.items.filter(font => 
-    Array.from(selectedTraits).some(trait => 
-      font.category.toLowerCase().includes(trait.toLowerCase()) || 
-      font.family.toLowerCase().includes(trait.toLowerCase())
-    )
-  ).slice(0, 4);
+  try {
+    const response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=${API_KEY}&sort=popularity`);
+    const data = await response.json();
+    
+    const filteredFonts = data.items.filter(font => 
+      Array.from(selectedTraits).some(trait => 
+        font.category.toLowerCase().includes(trait.toLowerCase()) || 
+        font.family.toLowerCase().includes(trait.toLowerCase())
+      )
+    ).slice(0, 4);
 
-  displayFonts(filteredFonts, headline);
+    displayFonts(filteredFonts, headline);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Fonts:', error);
+    alert('Fehler beim Laden der Schriftarten');
+  }
 }
 
-// Fonts anzeigen
 function displayFonts(fonts, headline) {
   const container = document.getElementById('font-container');
   container.innerHTML = '';
@@ -72,7 +73,9 @@ function displayFonts(fonts, headline) {
         ${headline}
       </div>
       <div class="font-explanation">
-        Passt zu: ${Array.from(selectedTraits).join(', ')}
+        <strong>${font.family}</strong>
+        <p>Passt zu: ${Array.from(selectedTraits).join(', ')}</p>
+        <p>Kategorie: ${font.category}</p>
       </div>
     `;
     
@@ -84,7 +87,6 @@ function displayFonts(fonts, headline) {
   });
 }
 
-// Filter zurücksetzen
 function resetFilters() {
   selectedTraits.clear();
   document.querySelectorAll('.filter-item input').forEach(input => input.checked = false);
