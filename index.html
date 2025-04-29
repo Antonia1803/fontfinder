@@ -8,20 +8,24 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <div class="container">
     <h1>Font Finder</h1>
-    <input type="text" id="headline-input" placeholder="Deine Headline hier eingeben">
-  </header>
+    
+    <div class="headline-input-container">
+      <input type="text" id="headline-input" placeholder="Deine Headline hier eingeben">
+    </div>
 
-  <main>
-    <section class="filter-section">
-      <h2>Filtereigenschaften auswählen (max. 4):</h2>
+    <div class="filter-section">
+      <h2>Wähle bis zu 4 Eigenschaften:</h2>
       <div class="filter-grid" id="filter-container"></div>
-      <button id="reset-btn">Filter zurücksetzen</button>
-    </section>
+      <div class="button-group">
+        <button id="apply-btn">Filter anwenden</button>
+        <button id="reset-btn">Filter zurücksetzen</button>
+      </div>
+    </div>
 
     <div class="font-grid" id="font-container"></div>
-  </main>
+  </div>
 
   <script src="main.js" type="module"></script>
 </body>
