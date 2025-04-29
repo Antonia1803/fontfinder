@@ -4,36 +4,43 @@
   <meta charset="UTF-8">
   <title>Schriftdetails</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 </head>
 <body>
-  <header>
-    <h1 id="detail-headline"></h1>
-    <div id="weight-container"></div>
-    <button onclick="window.location.href='index.html'" class="back-btn">Zurück zur Übersicht</button>
-  </header>
+  <div class="container">
+    <div id="headline-display" class="detail-headline"></div>
+    
+    <div class="weight-grid" id="weight-container"></div>
+    
+    <button onclick="window.location.href='index.html'" class="back-btn">
+      Zurück zur Übersicht
+    </button>
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const fontName = urlParams.get('font');
     const headline = urlParams.get('headline');
-    
-    document.getElementById('detail-headline').style.fontFamily = fontName;
-    document.getElementById('detail-headline').textContent = headline;
 
-    // Gewichte anzeigen
-    const weights = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
-    const container = document.getElementById('weight-container');
-    
-    weights.forEach(weight => {
-      const element = document.createElement('div');
-      element.className = 'weight-item';
-      element.innerHTML = `
-        <span style="font-family: '${fontName}'; font-weight: ${weight}">
-          ${headline} (${weight})
-        </span>
-      `;
-      container.appendChild(element);
+    // Schriftart laden
+    WebFont.load({
+      google: { families: [fontName] },
+      active: () => {
+        document.getElementById('headline-display').textContent = headline;
+        document.getElementById('headline-display').style.fontFamily = fontName;
+        loadWeights();
+      }
     });
-  </script>
-</body>
-</html>
+
+    function loadWeights() {
+      const weights = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
+      const container = document.getElementById('weight-container');
+      
+      weights.forEach(weight => {
+        const weightItem = document.createElement('div');
+        weightItem.className = 'weight-item';
+        weightItem.innerHTML = `
+          <div class="weight-preview" style="font-family: '${fontName}'; font-weight: ${weight}">
+            ${headline}
+          </div>
+          <div class="weight-label">Gewicht: ${weight
