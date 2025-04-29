@@ -1,4 +1,4 @@
-const API_KEY = 'DEIN_GOOGLE_FONTS_API_KEY';
+const API_KEY = 'AIzaSyAsYiOrdnXJe_-D6GhXzbJNbXO6jDcqft8';
 let selectedTraits = new Set();
 
 document.addEventListener('DOMContentLoaded', () => {
