@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Schriftdetails</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1 id="detail-headline"></h1>
+    <div id="weight-container"></div>
+    <button onclick="window.location.href='index.html'" class="back-btn">Zurück zur Übersicht</button>
+  </header>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fontName = urlParams.get('font');
+    const headline = urlParams.get('headline');
+    
+    document.getElementById('detail-headline').style.fontFamily = fontName;
+    document.getElementById('detail-headline').textContent = headline;
+
+    // Gewichte anzeigen
+    const weights = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
+    const container = document.getElementById('weight-container');
+    
+    weights.forEach(weight => {
+      const element = document.createElement('div');
+      element.className = 'weight-item';
+      element.innerHTML = `
+        <span style="font-family: '${fontName}'; font-weight: ${weight}">
+          ${headline} (${weight})
+        </span>
+      `;
+      container.appendChild(element);
+    });
+  </script>
+</body>
+</html>
