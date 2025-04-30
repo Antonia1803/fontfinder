@@ -1,3 +1,5 @@
+const apiKey = 'AIzaSyAsYiOrdnXJe_-D6GhXzbJNbXO6jDcqft8c';
+const apiUrl = `https://www.googleapis.com/webfonts/v1/webfonts?key=${apiKey}`;
 const properties = [
   "Innovation", "Authentizität", "Vertrauen", "Qualität", "Nachhaltigkeit",
   "Leidenschaft", "Kreativität", "Zuverlässigkeit", "Integrität", "Flexibilität",
@@ -6,77 +8,93 @@ const properties = [
   "Verantwortung", "Empathie", "Inspiration", "Selbstbewusstsein", "Freude"
 ];
 
-let fontsData = [];
 let selectedProperties = [];
+let fontsData = [];
 
-document.addEventListener("DOMContentLoaded", () => {
-  const filtersContainer = document.getElementById("filters-container");
-  const applyButton = document.getElementById("apply-filters");
-  const resetButton = document.getElementById("reset-filters");
-  const resultsContainer = document.getElementById("results");
-  const headlineInput = document.getElementById("headline-input");
-
-  // Checkboxen erstellen
+document.addEventListener('DOMContentLoaded', () => {
+  const filtersContainer = document.getElementById('property-filters');
   properties.forEach(prop => {
-    const label = document.createElement("label");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
     checkbox.value = prop;
-    checkbox.addEventListener("change", () => {
-      selectedProperties = Array.from(filtersContainer.querySelectorAll("input:checked")).map(cb => cb.value);
-    });
+    checkbox.addEventListener('change', handlePropertyChange);
     label.appendChild(checkbox);
     label.appendChild(document.createTextNode(prop));
     filtersContainer.appendChild(label);
   });
 
-  // Fonts-Daten laden
-  fetch("fonts.json")
+  document.getElementById('apply-filters').addEventListener('click', applyFilters);
+  document.getElementById('reset-filters').addEventListener('click', resetFilters);
+
+  fetchFonts();
+});
+
+function handlePropertyChange(event) {
+  const value = event.target.value;
+  if (event.target.checked) {
+    if (selectedProperties.length < 4) {
+      selectedProperties.push(value);
+    } else {
+      event.target.checked = false;
+      alert('Du kannst maximal 4 Eigenschaften auswählen.');
+    }
+  } else {
+    selectedProperties = selectedProperties.filter(prop => prop !== value);
+  }
+}
+
+function resetFilters() {
+  selectedProperties = [];
+  document.querySelectorAll('#property-filters input').forEach(input => {
+    input.checked = false;
+  });
+  displayFonts(fontsData);
+}
+
+function applyFilters() {
+  if (selectedProperties.length === 0) {
+    alert('Bitte wähle mindestens eine Eigenschaft aus.');
+    return;
+  }
+  // Beispielhafte Filterlogik: Hier kannst du deine eigene Logik implementieren
+  const filteredFonts = fontsData.filter(font => {
+    // Hier könnte man eine Zuordnung von Eigenschaften zu Schriftarten implementieren
+    // Für das Beispiel geben wir alle Schriftarten zurück
+    return true;
+  });
+  displayFonts(filteredFonts);
+}
+
+function fetchFonts() {
+  fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
-      fontsData = data;
-      renderFonts(fontsData);
+      fontsData = data.items;
+      displayFonts(fontsData);
+    })
+    .catch(error => {
+      console.error('Fehler beim Abrufen der Schriftarten:', error);
     });
+}
 
-  // Filter anwenden
-  applyButton.addEventListener("click", () => {
-    const filteredFonts = fontsData.filter(font =>
-      selectedProperties.every(prop => font.properties.includes(prop))
-    );
-    renderFonts(filteredFonts);
-  });
+function displayFonts(fonts) {
+  const resultsContainer = document.getElementById('font-results');
+  resultsContainer.innerHTML = '';
+  const headline = document.getElementById('headline-input').value || 'Beispieltext';
 
-  // Filter zurücksetzen
-  resetButton.addEventListener("click", () => {
-    filtersContainer.querySelectorAll("input").forEach(cb => cb.checked = false);
-    selectedProperties = [];
-    renderFonts(fontsData);
-  });
-
-  function renderFonts(fonts) {
-    resultsContainer.innerHTML = "";
-    const headlineText = headlineInput.value || "Beispieltext";
-
-    fonts.forEach(font => {
-      const card = document.createElement("div");
-      card.className = "font-card";
-      card.innerHTML = `
-        <div class="font-name">${font.name}</div>
-        <div class="font-preview" style="font-family: '${font.name}', sans-serif;">${headlineText}</div>
-        <p>${font.description}</p>
-      `;
-      card.addEventListener("click", () => {
-        const weightsParam = font.weights.join(",");
-        const url = `font-detail.html?font=${encodeURIComponent(font.name)}&weights=${encodeURIComponent(weightsParam)}&text=${encodeURIComponent(headlineText)}`;
-        window.open(url, "_blank");
-      });
-      resultsContainer.appendChild(card);
-
-      // Schriftart laden
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = `https://fonts.googleapis.com/css?family=${font.name.replace(/ /g, "+")}`;
-      document.head.appendChild(link);
+  fonts.slice(0, 20).forEach(font => {
+    const fontCard = document.createElement('div');
+    fontCard.className = 'font-card';
+    fontCard.style.fontFamily = font.family;
+    fontCard.innerHTML = `
+      <p style="font-family: '${font.family}', sans-serif;">${headline}</p>
+      <p>${font.family}</p>
+    `;
+    fontCard.addEventListener('click', () => {
+      const url = `font-detail.html?font=${encodeURIComponent(font.family)}&headline=${encodeURIComponent(headline)}`;
+      window.location.href = url;
     });
-  }
-});
+    resultsContainer.appendChild(fontCard);
+  });
+}
