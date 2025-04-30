@@ -3,62 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schriftart Detailansicht</title>
+  <title>Font Detail</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" async></script>
 </head>
 <body>
-  <div class="container">
-    <h1 id="font-name">Schriftart Name</h1>
-    <div>
-      <label for="font-weight">Schriftschnitt auswählen:</label>
-      <select id="font-weight">
-        <!-- Optionen werden dynamisch hinzugefügt -->
-      </select>
+  <header>
+    <h1>Font Finder</h1>
+  </header>
+  <main>
+    <section class="headline-display">
+      <h2 id="selected-headline"></h2>
+    </section>
+    <section class="weights-section">
+      <h3>Verfügbare Schriftschnitte:</h3>
+      <div id="weight-options"></div>
+    </section>
+    <div class="buttons">
+      <button id="back-button">Zurück</button>
     </div>
-    <div id="headline-preview" class="text-preview">
-      Deine Headline hier
-    </div>
-    <button onclick="window.history.back()">Zurück</button>
-  </div>
+  </main>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const fontName = urlParams.get('font');
-      const fontWeights = urlParams.get('weights') ? urlParams.get('weights').split(',') : ['400'];
-      const headlineText = urlParams.get('text') || 'Beispieltext';
+    // JavaScript für die Detailseite
+    const urlParams = new URLSearchParams(window.location.search);
+    const fontName = urlParams.get('font');
+    const headline = urlParams.get('headline');
 
-      const fontNameElement = document.getElementById('font-name');
-      const fontWeightSelect = document.getElementById('font-weight');
-      const headlinePreview = document.getElementById('headline-preview');
+    document.getElementById('selected-headline').textContent = headline;
+    document.getElementById('selected-headline').style.fontFamily = fontName;
 
-      fontNameElement.textContent = fontName;
-      headlinePreview.textContent = headlineText;
-
-      // Optionen für Schriftschnitte hinzufügen
-      fontWeights.forEach(weight => {
-        const option = document.createElement('option');
-        option.value = weight;
-        option.textContent = `Gewicht ${weight}`;
-        fontWeightSelect.appendChild(option);
+    fetch('fonts.json')
+      .then(response => response.json())
+      .then(fonts => {
+        const font = fonts.find(f => f.name === fontName);
+        if (font) {
+          const weightOptions = document.getElementById('weight-options');
+          font.weights.forEach(weight => {
+            const button = document.createElement('button');
+            button.textContent = weight;
+            button.addEventListener('click', () => {
+              document.getElementById('selected-headline').style.fontWeight = weight;
+            });
+            weightOptions.appendChild(button);
+          });
+        }
       });
 
-      function loadFont(weight) {
-        WebFont.load({
-          google: {
-            families: [`${fontName}:${weight}`]
-          },
-          active: function () {
-            headlinePreview.style.fontFamily = fontName;
-            headlinePreview.style.fontWeight = weight;
-          }
-        });
-      }
-
-      // Initiale Schriftart laden
-      loadFont(fontWeights[0]);
-
-      // Event Listener für Schriftschnitt-Auswahl
-      fontWeightSelect.addEventListener('change', function
-::contentReference[oaicite:19]{index=19}
- 
+    document.getElementById('back-button').addEventListener('click', () => {
+      window.history.back();
+    });
+  </script>
+</body>
+</html>
