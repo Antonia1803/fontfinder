@@ -14,19 +14,15 @@
     <section class="input-section">
       <input type="text" id="headline-input" placeholder="Gib deine Headline ein" />
     </section>
-    <section class="filters">
-      <h2>Filter</h2>
-      <div id="filters-container">
-        <!-- Checkboxen werden hier dynamisch eingefügt -->
-      </div>
+    <section class="filter-section">
+      <h2>Wähle bis zu 4 Eigenschaften:</h2>
+      <div id="property-filters"></div>
       <div class="buttons">
         <button id="apply-filters">Filter anwenden</button>
         <button id="reset-filters">Filter zurücksetzen</button>
       </div>
     </section>
-    <section class="results" id="results">
-      <!-- Gefilterte Schriftarten werden hier angezeigt -->
-    </section>
+    <section id="font-results" class="font-results"></section>
   </main>
   <script src="main.js"></script>
 </body>
